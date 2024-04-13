@@ -1,7 +1,6 @@
-// let x = 45 + (foo * bar)
-
 export enum TokenType {
   Let,
+  Null,
   Identifier,
   Number,
   Equals,
@@ -13,6 +12,7 @@ export enum TokenType {
 
 const KEYWORDS: Record<string, TokenType> = {
   let: TokenType.Let,
+  null: TokenType.Null,
 };
 
 export interface Token {
@@ -39,8 +39,9 @@ export function tokenize(sourceCode: string): Token[] {
       case "+":
       case "-":
       case "*":
-      case "/": {
-        tokens.push(createToken(src.shift()!, TokenType.OpenParen));
+      case "/":
+      case "%": {
+        tokens.push(createToken(src.shift()!, TokenType.BinaryOperator));
         break;
       }
 
@@ -71,7 +72,7 @@ export function tokenize(sourceCode: string): Token[] {
           tokens.push(
             createToken(
               identifier,
-              Object.hasOwn(KEYWORDS, identifier)
+              KEYWORDS[identifier] && typeof KEYWORDS[identifier] === "number"
                 ? KEYWORDS[identifier]
                 : TokenType.Identifier
             )
@@ -108,11 +109,4 @@ function isInt(value: string): boolean {
 
 function isSkippable(value: string): boolean {
   return value === " " || value === "\n" || value === "\t";
-}
-
-const sourceCode = await Bun.file("./test.kft").text();
-console.log(sourceCode);
-
-for (const token of tokenize(sourceCode)) {
-  console.log(token);
 }
