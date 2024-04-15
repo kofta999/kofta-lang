@@ -5,6 +5,7 @@ import type {
   NumericLiteral,
   Identifier,
   Expr,
+  VarDeclaration,
 } from "./ast";
 
 import { tokenize, type Token, TokenType } from "./lexer";
@@ -36,7 +37,57 @@ export default class Parser {
   }
 
   private parseStatement(): Statement {
-    return this.parseExpr();
+    switch (this.at().type) {
+      case TokenType.Let:
+      case TokenType.Const:
+        return this.parseVarDeclaration();
+
+      default:
+        return this.parseExpr();
+    }
+  }
+
+  private parseVarDeclaration(): Statement {
+    const isConstant = this.eat().type === TokenType.Const;
+    const identifier = this.expect(
+      TokenType.Identifier,
+      `Expected identifier name following ${
+        isConstant ? "const" : "let"
+      } keyword.`
+    ).value;
+
+    if (this.at().type === TokenType.SemiColon) {
+      this.eat(); // expect semicolon
+      if (isConstant)
+        throw "Must assign value to constant expression. No value provided";
+
+      return {
+        kind: "VarDeclaration",
+        constant: false,
+        identifier,
+        value: undefined,
+      } as VarDeclaration;
+    }
+
+    this.expect(
+      TokenType.Equals,
+      "Expected equals token following identifier in variable declaration."
+    );
+
+    const declaration: VarDeclaration = {
+      kind: "VarDeclaration",
+      value: this.parseExpr(),
+      constant: isConstant,
+      identifier,
+    };
+
+    // TODO: Make this optional later
+    this.expect(
+      TokenType.SemiColon,
+      "Variable declaration must end with a semi colon"
+    );
+
+    return declaration;
   }
 
   private parseExpr(): Expr {

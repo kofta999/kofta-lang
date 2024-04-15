@@ -1,8 +1,10 @@
 export enum TokenType {
   Let,
+  Const,
   Identifier,
   Number,
   Equals,
+  SemiColon,
   OpenParen,
   CloseParen,
   BinaryOperator,
@@ -11,6 +13,7 @@ export enum TokenType {
 
 const KEYWORDS: Record<string, TokenType> = {
   let: TokenType.Let,
+  const: TokenType.Const,
 };
 
 export interface Token {
@@ -48,6 +51,11 @@ export function tokenize(sourceCode: string): Token[] {
         break;
       }
 
+      case ";": {
+        tokens.push(createToken(src.shift()!, TokenType.SemiColon));
+        break;
+      }
+
       // handle multi character token
       default: {
         // build number token
@@ -70,7 +78,7 @@ export function tokenize(sourceCode: string): Token[] {
           tokens.push(
             createToken(
               identifier,
-              KEYWORDS[identifier] && typeof KEYWORDS[identifier] === "number"
+              typeof KEYWORDS[identifier] === "number"
                 ? KEYWORDS[identifier]
                 : TokenType.Identifier
             )
@@ -78,7 +86,7 @@ export function tokenize(sourceCode: string): Token[] {
         } else if (isSkippable(src[0])) {
           src.shift();
         } else {
-          console.log(
+          console.error(
             "LexerError: Unrecognized character found in source, ",
             src.shift()!
           );
