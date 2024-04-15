@@ -1,6 +1,5 @@
 export enum TokenType {
   Let,
-  Null,
   Identifier,
   Number,
   Equals,
@@ -12,7 +11,6 @@ export enum TokenType {
 
 const KEYWORDS: Record<string, TokenType> = {
   let: TokenType.Let,
-  null: TokenType.Null,
 };
 
 export interface Token {
@@ -80,7 +78,10 @@ export function tokenize(sourceCode: string): Token[] {
         } else if (isSkippable(src[0])) {
           src.shift();
         } else {
-          console.log("Unrecognized character found in source:", src.shift()!);
+          console.log(
+            "LexerError: Unrecognized character found in source, ",
+            src.shift()!
+          );
           process.exit(1);
         }
       }

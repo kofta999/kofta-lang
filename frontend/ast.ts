@@ -1,12 +1,8 @@
 export type NodeType =
   | "Program"
   | "NumericLiteral"
-  | "NullLiteral"
   | "Identifier"
   | "BinaryExpr";
-// | "CallExpr"
-// | "UnaryExpr"
-// | "FunctionDeclaration";
 
 export interface Statement {
   kind: NodeType;
@@ -34,9 +30,4 @@ export interface Identifier extends Expr {
 export interface NumericLiteral extends Expr {
   kind: "NumericLiteral";
   value: number;
-}
-
-export interface NullLiteral extends Expr {
-  kind: "NullLiteral";
-  value: "null";
 }

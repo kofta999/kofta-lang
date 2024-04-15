@@ -5,7 +5,6 @@ import type {
   NumericLiteral,
   Identifier,
   Expr,
-  NullLiteral,
 } from "./ast";
 
 import { tokenize, type Token, TokenType } from "./lexer";
@@ -90,11 +89,6 @@ export default class Parser {
     switch (tk) {
       case TokenType.Identifier:
         return { kind: "Identifier", symbol: this.eat().value } as Identifier;
-
-      case TokenType.Null: {
-        this.eat();
-        return { kind: "NullLiteral", value: "null" } as NullLiteral;
-      }
 
       case TokenType.Number:
         return {

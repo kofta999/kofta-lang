@@ -1,11 +1,13 @@
-import type { RuntimeVal, NumberVal, NullVal } from "./values";
+import { type RuntimeVal, type NumberVal, MK_NULL } from "./values";
 import type {
   BinaryExpr,
   NodeType,
   NumericLiteral,
   Program,
   Statement,
+  Identifier,
 } from "../frontend/ast";
+import Environment from "./environment";
 
 function evaluateNumericBinaryExpr(
   lhs: NumberVal,
@@ -35,19 +37,19 @@ function evaluateNumericBinaryExpr(
   return { type: "number", value: result };
 }
 
-function evaluateProgram(program: Program): RuntimeVal {
-  let lastEvaluated: RuntimeVal = { type: "null", value: "null" } as NullVal;
+function evaluateProgram(program: Program, env: Environment): RuntimeVal {
+  let lastEvaluated: RuntimeVal = MK_NULL();
 
   for (const statement of program.body) {
-    lastEvaluated = evaluate(statement);
+    lastEvaluated = evaluate(statement, env);
   }
 
   return lastEvaluated;
 }
 
-function evaluateBinaryExpr(binOp: BinaryExpr): RuntimeVal {
-  const leftHandSide = evaluate(binOp.left);
-  const rightHandSide = evaluate(binOp.right);
+function evaluateBinaryExpr(binOp: BinaryExpr, env: Environment): RuntimeVal {
+  const leftHandSide = evaluate(binOp.left, env);
+  const rightHandSide = evaluate(binOp.right, env);
 
   if (leftHandSide.type === "number" && rightHandSide.type === "number") {
     return evaluateNumericBinaryExpr(
@@ -57,10 +59,14 @@ function evaluateBinaryExpr(binOp: BinaryExpr): RuntimeVal {
     );
   }
 
-  return { type: "null", value: "null" } as NullVal;
+  return MK_NULL();
 }
 
-export function evaluate(astNode: Statement) {
+function evaluateIdentifier(ident: Identifier, env: Environment) {
+  return env.lookupVar(ident.symbol);
+}
+
+export function evaluate(astNode: Statement, env: Environment) {
   switch (astNode.kind) {
     case "NumericLiteral":
       return {
@@ -68,14 +74,14 @@ export function evaluate(astNode: Statement) {
         type: "number",
       } as NumberVal;
 
-    case "NullLiteral":
-      return { value: "null", type: "null" } as NullVal;
+    case "Identifier":
+      return evaluateIdentifier(astNode as Identifier, env);
 
     case "BinaryExpr":
-      return evaluateBinaryExpr(astNode as BinaryExpr);
+      return evaluateBinaryExpr(astNode as BinaryExpr, env);
 
     case "Program":
-      return evaluateProgram(astNode as Program);
+      return evaluateProgram(astNode as Program, env);
 
     default:
       console.error(
