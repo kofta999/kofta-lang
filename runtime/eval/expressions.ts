@@ -1,4 +1,8 @@
-import type { BinaryExpr, Identifier } from "../../frontend/ast";
+import type {
+  AssignmentExpr,
+  BinaryExpr,
+  Identifier,
+} from "../../frontend/ast";
 import type Environment from "../environment";
 import { evaluate } from "../interpreter";
 import { type NumberVal, type RuntimeVal, MK_NULL } from "../values";
@@ -49,6 +53,22 @@ export function evaluateBinaryExpr(
   return MK_NULL();
 }
 
-export function evaluateIdentifier(ident: Identifier, env: Environment) {
+export function evaluateIdentifier(
+  ident: Identifier,
+  env: Environment
+): RuntimeVal {
   return env.lookupVar(ident.symbol);
+}
+
+export function evaluateAssignment(
+  { assignee, value }: AssignmentExpr,
+  env: Environment
+): RuntimeVal {
+  if (assignee.kind !== "Identifier") {
+    throw `Invalid left hand side inside assignment expression ${JSON.stringify(
+      assignee
+    )}`;
+  }
+
+  return env.assignVar((assignee as Identifier).symbol, evaluate(value, env));
 }

@@ -6,6 +6,7 @@ import type {
   Identifier,
   Expr,
   VarDeclaration,
+  AssignmentExpr,
 } from "./ast";
 
 import { tokenize, type Token, TokenType } from "./lexer";
@@ -91,7 +92,25 @@ export default class Parser {
   }
 
   private parseExpr(): Expr {
-    return this.parseAdditiveExpr();
+    return this.parseAssignmentExpr();
+  }
+
+  private parseAssignmentExpr(): Expr {
+    // TODO: Switch this out with ObjectExpr later
+    const left = this.parseAdditiveExpr();
+
+    if (this.at().type === TokenType.Equals) {
+      this.eat();
+      const value = this.parseAssignmentExpr();
+
+      return {
+        assignee: left,
+        kind: "AssignmentExpr",
+        value,
+      } as AssignmentExpr;
+    }
+
+    return left;
   }
 
   private parseAdditiveExpr(): Expr {

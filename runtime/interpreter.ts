@@ -1,4 +1,4 @@
-import { type NumberVal } from "./values";
+import { type NumberVal, type RuntimeVal } from "./values";
 import type {
   BinaryExpr,
   NumericLiteral,
@@ -6,12 +6,17 @@ import type {
   Statement,
   Identifier,
   VarDeclaration,
+  AssignmentExpr,
 } from "../frontend/ast";
 import Environment from "./environment";
-import { evaluateIdentifier, evaluateBinaryExpr } from "./eval/expressions";
+import {
+  evaluateIdentifier,
+  evaluateBinaryExpr,
+  evaluateAssignment,
+} from "./eval/expressions";
 import { evaluateProgram, evaluateVarDeclaration } from "./eval/statements";
 
-export function evaluate(astNode: Statement, env: Environment) {
+export function evaluate(astNode: Statement, env: Environment): RuntimeVal {
   switch (astNode.kind) {
     // Handle Expressions
     case "NumericLiteral":
@@ -25,6 +30,9 @@ export function evaluate(astNode: Statement, env: Environment) {
 
     case "BinaryExpr":
       return evaluateBinaryExpr(astNode as BinaryExpr, env);
+
+    case "AssignmentExpr":
+      return evaluateAssignment(astNode as AssignmentExpr, env);
 
     // Handle Statements
     case "Program":
