@@ -2,10 +2,16 @@ import type {
   AssignmentExpr,
   BinaryExpr,
   Identifier,
+  ObjectLiteral,
 } from "../../frontend/ast";
 import type Environment from "../environment";
 import { evaluate } from "../interpreter";
-import { type NumberVal, type RuntimeVal, MK_NULL } from "../values";
+import {
+  type NumberVal,
+  type RuntimeVal,
+  MK_NULL,
+  type ObjectVal,
+} from "../values";
 
 function evaluateNumericBinaryExpr(
   lhs: NumberVal,
@@ -71,4 +77,20 @@ export function evaluateAssignment(
   }
 
   return env.assignVar((assignee as Identifier).symbol, evaluate(value, env));
+}
+
+export function evaluateObjectExpr(
+  obj: ObjectLiteral,
+  env: Environment
+): RuntimeVal {
+  const object: ObjectVal = { type: "object", properties: new Map() };
+
+  for (const { key, value } of obj.properties) {
+    // Deals with the shorthand syntax { foo } so its gonna search the env for foo
+    const runtimeVal = value ? evaluate(value, env) : env.lookupVar(key);
+
+    object.properties.set(key, runtimeVal);
+  }
+
+  return object;
 }

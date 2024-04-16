@@ -1,13 +1,27 @@
 export enum TokenType {
+  // Keywords
   Let,
   Const,
+
+  // Literal Types
   Identifier,
   Number,
+
+  // Grouping Operators
+  OpenQuote,
+  CloseQuote,
+  String,
   Equals,
   SemiColon,
   OpenParen,
   CloseParen,
   BinaryOperator,
+  Colon,
+  Comma,
+  OpenBrace,
+  CloseBrace,
+
+  // End of File
   EOF,
 }
 
@@ -34,6 +48,26 @@ export function tokenize(sourceCode: string): Token[] {
 
       case ")": {
         tokens.push(createToken(src.shift()!, TokenType.CloseParen));
+        break;
+      }
+
+      case "{": {
+        tokens.push(createToken(src.shift()!, TokenType.OpenBrace));
+        break;
+      }
+
+      case "}": {
+        tokens.push(createToken(src.shift()!, TokenType.CloseBrace));
+        break;
+      }
+
+      case ":": {
+        tokens.push(createToken(src.shift()!, TokenType.Colon));
+        break;
+      }
+
+      case ",": {
+        tokens.push(createToken(src.shift()!, TokenType.Comma));
         break;
       }
 
@@ -117,5 +151,5 @@ function isInt(value: string): boolean {
 }
 
 function isSkippable(value: string): boolean {
-  return value === " " || value === "\n" || value === "\t";
+  return value === " " || value === "\n" || value === "\t" || value === "\r";
 }

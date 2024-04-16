@@ -1,0 +1,9 @@
+const s = 5;
+const x = {
+  x: 100 + 5,
+  y: 50,
+  s,
+  z: {
+    a: true
+  }
+};

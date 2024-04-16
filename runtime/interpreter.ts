@@ -7,12 +7,14 @@ import type {
   Identifier,
   VarDeclaration,
   AssignmentExpr,
+  ObjectLiteral,
 } from "../frontend/ast";
 import Environment from "./environment";
 import {
   evaluateIdentifier,
   evaluateBinaryExpr,
   evaluateAssignment,
+  evaluateObjectExpr,
 } from "./eval/expressions";
 import { evaluateProgram, evaluateVarDeclaration } from "./eval/statements";
 
@@ -40,6 +42,9 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeVal {
 
     case "VarDeclaration":
       return evaluateVarDeclaration(astNode as VarDeclaration, env);
+
+    case "ObjectLiteral":
+      return evaluateObjectExpr(astNode as ObjectLiteral, env);
 
     default:
       console.error(
