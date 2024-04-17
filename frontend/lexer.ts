@@ -8,9 +8,6 @@ export enum TokenType {
   Number,
 
   // Grouping Operators
-  OpenQuote,
-  CloseQuote,
-  String,
   Equals,
   SemiColon,
   OpenParen,
@@ -18,8 +15,11 @@ export enum TokenType {
   BinaryOperator,
   Colon,
   Comma,
+  Dot,
   OpenBrace,
   CloseBrace,
+  OpenBracket,
+  CloseBracket,
 
   // End of File
   EOF,
@@ -61,6 +61,16 @@ export function tokenize(sourceCode: string): Token[] {
         break;
       }
 
+      case "[": {
+        tokens.push(createToken(src.shift()!, TokenType.OpenBracket));
+        break;
+      }
+
+      case "]": {
+        tokens.push(createToken(src.shift()!, TokenType.CloseBracket));
+        break;
+      }
+
       case ":": {
         tokens.push(createToken(src.shift()!, TokenType.Colon));
         break;
@@ -68,6 +78,11 @@ export function tokenize(sourceCode: string): Token[] {
 
       case ",": {
         tokens.push(createToken(src.shift()!, TokenType.Comma));
+        break;
+      }
+
+      case ".": {
+        tokens.push(createToken(src.shift()!, TokenType.Dot));
         break;
       }
 

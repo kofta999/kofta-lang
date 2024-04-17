@@ -1,9 +1,11 @@
 const s = 5;
-const x = {
+const object = {
   x: 100 + 5,
   y: 50,
   s,
-  z: {
-    a: true
+  complex: {
+    bar: true
   }
 };
+
+let s = object.foo() + 5; 

@@ -9,6 +9,8 @@ import type {
   AssignmentExpr,
   Property,
   ObjectLiteral,
+  CallExpr,
+  MemberExpr,
 } from "./ast";
 
 import { tokenize, type Token, TokenType } from "./lexer";
@@ -181,7 +183,7 @@ export default class Parser {
   }
 
   private parseMultiplicativeExpr(): Expr {
-    let left = this.parsePrimaryExpr();
+    let left = this.parseCallMemberExpr();
 
     while (
       this.at().value === "*" ||
@@ -189,7 +191,7 @@ export default class Parser {
       this.at().value === "%"
     ) {
       const operator = this.eat().value;
-      const right = this.parsePrimaryExpr();
+      const right = this.parseCallMemberExpr();
 
       left = {
         kind: "BinaryExpr",
@@ -200,6 +202,92 @@ export default class Parser {
     }
 
     return left;
+  }
+
+  private parseCallMemberExpr(): Expr {
+    const member = this.parseMemberExpr();
+
+    if (this.at().type === TokenType.OpenParen) {
+      return this.parseCallExpr(member);
+    }
+
+    return member;
+  }
+
+  private parseCallExpr(callee: Expr): Expr {
+    let callExpr: Expr = {
+      kind: "CallExpr",
+      args: this.parseArgs(),
+      callee,
+    } as CallExpr;
+
+    if (this.at().type === TokenType.OpenParen) {
+      callExpr = this.parseCallExpr(callExpr);
+    }
+
+    return callExpr;
+  }
+
+  private parseArgs(): Expr[] {
+    this.expect(TokenType.OpenParen, "Expected open parenthesis");
+    const args =
+      this.at().type === TokenType.CloseParen ? [] : this.parseArgumentsList();
+
+    this.expect(
+      TokenType.CloseParen,
+      "Missing closing parenthesis inside arguments list"
+    );
+
+    return args;
+  }
+
+  private parseArgumentsList(): Expr[] {
+    const args = [this.parseAssignmentExpr()];
+
+    while (this.at().type === TokenType.Comma && this.eat()) {
+      args.push(this.parseAssignmentExpr());
+    }
+
+    return args;
+  }
+
+  private parseMemberExpr(): Expr {
+    let object = this.parsePrimaryExpr();
+
+    while (
+      this.at().type === TokenType.Dot ||
+      this.at().type === TokenType.OpenBracket
+    ) {
+      const operator = this.eat();
+      let property: Expr;
+      let computed: boolean;
+
+      if (operator.type === TokenType.Dot) {
+        computed = false;
+        property = this.parsePrimaryExpr();
+
+        if (property.kind !== "Identifier") {
+          throw `Cannot use dot operator without right hand side being an identifier.`;
+        }
+      } else {
+        computed = true;
+        property = this.parseExpr();
+
+        this.expect(
+          TokenType.CloseBracket,
+          "Missing closing bracket in computed value."
+        );
+      }
+
+      object = {
+        kind: "MemberExpr",
+        object,
+        property,
+        computed,
+      } as MemberExpr;
+    }
+
+    return object;
   }
 
   private parsePrimaryExpr(): Expr {
