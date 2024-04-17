@@ -1,4 +1,4 @@
-import { type NumberVal, type RuntimeVal } from "./values";
+import { type NumberVal, type RuntimeVal, type StringVal } from "./values";
 import type {
   BinaryExpr,
   NumericLiteral,
@@ -8,6 +8,7 @@ import type {
   VarDeclaration,
   AssignmentExpr,
   ObjectLiteral,
+  StringLiteral,
 } from "../frontend/ast";
 import Environment from "./environment";
 import {
@@ -26,6 +27,12 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeVal {
         value: (astNode as NumericLiteral).value,
         type: "number",
       } as NumberVal;
+
+    case "StringLiteral":
+      return {
+        value: (astNode as StringLiteral).value,
+        type: "string",
+      } as StringVal;
 
     case "Identifier":
       return evaluateIdentifier(astNode as Identifier, env);

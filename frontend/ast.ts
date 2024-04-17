@@ -13,7 +13,8 @@ export type NodeType =
   | "Identifier"
   | "BinaryExpr"
   | "Property"
-  | "ObjectLiteral";
+  | "ObjectLiteral"
+  | "StringLiteral";
 
 // Statements
 
@@ -57,6 +58,12 @@ export interface CallExpr extends Expr {
   callee: Expr;
 }
 
+export interface AssignmentExpr extends Expr {
+  kind: "AssignmentExpr";
+  assignee: Expr;
+  value: Expr;
+}
+
 // Literals
 
 export interface Identifier extends Expr {
@@ -80,8 +87,7 @@ export interface ObjectLiteral extends Expr {
   properties: Property[];
 }
 
-export interface AssignmentExpr extends Expr {
-  kind: "AssignmentExpr";
-  assignee: Expr;
-  value: Expr;
+export interface StringLiteral extends Expr {
+  kind: "StringLiteral";
+  value: string;
 }

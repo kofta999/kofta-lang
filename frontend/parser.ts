@@ -11,6 +11,7 @@ import type {
   ObjectLiteral,
   CallExpr,
   MemberExpr,
+  StringLiteral,
 } from "./ast";
 
 import { tokenize, type Token, TokenType } from "./lexer";
@@ -302,6 +303,12 @@ export default class Parser {
           kind: "NumericLiteral",
           value: parseFloat(this.eat().value),
         } as NumericLiteral;
+
+      case TokenType.String:
+        return {
+          kind: "StringLiteral",
+          value: this.eat().value,
+        } as StringLiteral;
 
       case TokenType.OpenParen: {
         this.eat();

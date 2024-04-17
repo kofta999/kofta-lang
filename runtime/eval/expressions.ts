@@ -11,6 +11,7 @@ import {
   type RuntimeVal,
   MK_NULL,
   type ObjectVal,
+  type StringVal,
 } from "../values";
 
 function evaluateNumericBinaryExpr(
@@ -54,6 +55,16 @@ export function evaluateBinaryExpr(
       rightHandSide as NumberVal,
       binOp.operator
     );
+  } else if (
+    leftHandSide.type === "string" &&
+    rightHandSide.type === "string" &&
+    binOp.operator === "+"
+  ) {
+    return {
+      type: "string",
+      value:
+        (leftHandSide as StringVal).value + (rightHandSide as StringVal).value,
+    } as StringVal;
   }
 
   return MK_NULL();

@@ -6,6 +6,7 @@ export enum TokenType {
   // Literal Types
   Identifier,
   Number,
+  String,
 
   // Grouping Operators
   Equals,
@@ -20,6 +21,7 @@ export enum TokenType {
   CloseBrace,
   OpenBracket,
   CloseBracket,
+  DoubleQuote,
 
   // End of File
   EOF,
@@ -41,6 +43,23 @@ export function tokenize(sourceCode: string): Token[] {
 
   while (src.length > 0) {
     switch (src[0]) {
+      case `"`: {
+        src.shift();
+        let string = "";
+
+        while (src.length > 0 && src[0] !== `"`) {
+          string += src.shift();
+        }
+
+        if (src[0] === `"`) {
+          tokens.push(createToken(string, TokenType.String));
+        }
+
+        src.shift();
+
+        break;
+      }
+
       case "(": {
         tokens.push(createToken(src.shift()!, TokenType.OpenParen));
         break;
