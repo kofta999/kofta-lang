@@ -1,9 +1,14 @@
+import { print, time } from "./native-fn";
 import { MK_BOOL, MK_NULL, type RuntimeVal } from "./values";
 
 function setupScope(env: Environment) {
   env.declareVar("true", MK_BOOL(true), true);
   env.declareVar("false", MK_BOOL(false), true);
   env.declareVar("null", MK_NULL(), true);
+
+  // Define native built-in methods
+  env.declareVar("print", print, true);
+  env.declareVar("time", time, true);
 }
 
 export default class Environment {

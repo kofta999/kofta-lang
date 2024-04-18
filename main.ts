@@ -3,9 +3,9 @@ import Parser from "./frontend/parser";
 import { evaluate } from "./runtime/interpreter";
 import Environment from "./runtime/environment";
 
-repl();
+// repl();
 
-// run();
+run();
 
 async function run() {
   const parser = new Parser();
@@ -35,7 +35,7 @@ async function repl() {
 
     const result = evaluate(program, env);
 
-    console.log(result);
+    // console.log(result);
     console.write("\n> ");
   }
 }

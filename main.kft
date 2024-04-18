@@ -8,4 +8,6 @@ const object = {
   }
 };
 
-let s = object.foo() + 5; 
+
+
+print(object)

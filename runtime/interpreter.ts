@@ -9,6 +9,7 @@ import type {
   AssignmentExpr,
   ObjectLiteral,
   StringLiteral,
+  CallExpr,
 } from "../frontend/ast";
 import Environment from "./environment";
 import {
@@ -16,6 +17,7 @@ import {
   evaluateBinaryExpr,
   evaluateAssignment,
   evaluateObjectExpr,
+  evaluateCallExpr,
 } from "./eval/expressions";
 import { evaluateProgram, evaluateVarDeclaration } from "./eval/statements";
 
@@ -43,15 +45,18 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeVal {
     case "AssignmentExpr":
       return evaluateAssignment(astNode as AssignmentExpr, env);
 
+    case "ObjectLiteral":
+      return evaluateObjectExpr(astNode as ObjectLiteral, env);
+
+    case "CallExpr":
+      return evaluateCallExpr(astNode as CallExpr, env);
+
     // Handle Statements
     case "Program":
       return evaluateProgram(astNode as Program, env);
 
     case "VarDeclaration":
       return evaluateVarDeclaration(astNode as VarDeclaration, env);
-
-    case "ObjectLiteral":
-      return evaluateObjectExpr(astNode as ObjectLiteral, env);
 
     default:
       console.error(

@@ -316,7 +316,7 @@ export default class Parser {
         this.expect(
           TokenType.CloseParen,
           "Unexpected token found inside parenthesized expression, Expected closing parenthesis."
-        );
+        )
 
         return value;
       }

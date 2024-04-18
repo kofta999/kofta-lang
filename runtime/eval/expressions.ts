@@ -1,6 +1,7 @@
 import type {
   AssignmentExpr,
   BinaryExpr,
+  CallExpr,
   Identifier,
   ObjectLiteral,
 } from "../../frontend/ast";
@@ -12,6 +13,7 @@ import {
   MK_NULL,
   type ObjectVal,
   type StringVal,
+  type NativeFnVal,
 } from "../values";
 
 function evaluateNumericBinaryExpr(
@@ -104,4 +106,15 @@ export function evaluateObjectExpr(
   }
 
   return object;
+}
+
+export function evaluateCallExpr(expr: CallExpr, env: Environment): RuntimeVal {
+  const args = expr.args.map((arg) => evaluate(arg, env));
+  const fn = evaluate(expr.callee, env);
+
+  if (fn.type !== "nativeFn") {
+    throw "Cannot call a value that is not a function: " + JSON.stringify(fn);
+  }
+
+  return (fn as NativeFnVal).call(args, env);
 }
