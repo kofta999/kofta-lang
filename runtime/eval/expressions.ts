@@ -35,7 +35,8 @@ function evaluateNumericBinaryExpr(
       result = lhs.value * rhs.value;
       break;
     case "/":
-      // TODO: Division by zero checks
+      if (rhs.value === 0) throw "DivisionByZeroError: rhs value is zero";
+
       result = lhs.value / rhs.value;
       break;
     case "%":
@@ -122,9 +123,10 @@ export function evaluateCallExpr(expr: CallExpr, env: Environment): RuntimeVal {
     const scope = new Environment(func.declarationEnv);
 
     // Create the variables for the parameter list
+    if (func.parameters.length !== args.length) {
+      throw `The function needs ${func.parameters.length} arguments, but you only passed ${args.length}`;
+    }
     for (let i = 0; i < func.parameters.length; i++) {
-      // TODO: Check the bounds here
-      // Verify arity of the function
       scope.declareVar(func.parameters[i], args[i], false);
     }
 

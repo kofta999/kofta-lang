@@ -14,9 +14,8 @@ async function run() {
   const file = Bun.file("main.kft");
 
   const program = parser.produceAST(await file.text());
-  const result = evaluate(program, env);
 
-  console.log(result);
+  const result = evaluate(program, env);
 }
 
 async function repl() {

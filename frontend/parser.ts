@@ -43,17 +43,32 @@ export default class Parser {
     return prev;
   }
 
+  private ignoreSemiColon() {
+    if (this.tokens[0].type === TokenType.SemiColon) {
+      this.tokens.shift();
+    }
+  }
+
   private parseStatement(): Statement {
     switch (this.at().type) {
       case TokenType.Let:
-      case TokenType.Const:
-        return this.parseVarDeclaration();
+      case TokenType.Const: {
+        const res = this.parseVarDeclaration();
+        this.ignoreSemiColon();
+        return res;
+      }
 
-      case TokenType.Func:
-        return this.parseFunctionDeclaration();
+      case TokenType.Func: {
+        const res = this.parseFunctionDeclaration();
+        this.ignoreSemiColon();
+        return res;
+      }
 
-      default:
-        return this.parseExpr();
+      default: {
+        const res = this.parseExpr();
+        this.ignoreSemiColon();
+        return res;
+      }
     }
   }
 
@@ -138,12 +153,6 @@ export default class Parser {
       constant: isConstant,
       identifier,
     };
-
-    // TODO: Make this optional later
-    this.expect(
-      TokenType.SemiColon,
-      "Variable declaration must end with a semi colon"
-    );
 
     return declaration;
   }
