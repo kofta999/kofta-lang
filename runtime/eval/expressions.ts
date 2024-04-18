@@ -5,7 +5,7 @@ import type {
   Identifier,
   ObjectLiteral,
 } from "../../frontend/ast";
-import type Environment from "../environment";
+import Environment from "../environment";
 import { evaluate } from "../interpreter";
 import {
   type NumberVal,
@@ -14,6 +14,7 @@ import {
   type ObjectVal,
   type StringVal,
   type NativeFnVal,
+  type FunctionVal,
 } from "../values";
 
 function evaluateNumericBinaryExpr(
@@ -112,9 +113,30 @@ export function evaluateCallExpr(expr: CallExpr, env: Environment): RuntimeVal {
   const args = expr.args.map((arg) => evaluate(arg, env));
   const fn = evaluate(expr.callee, env);
 
-  if (fn.type !== "nativeFn") {
-    throw "Cannot call a value that is not a function: " + JSON.stringify(fn);
+  if (fn.type === "nativeFn") {
+    return (fn as NativeFnVal).call(args, env);
   }
 
-  return (fn as NativeFnVal).call(args, env);
+  if (fn.type === "function") {
+    const func = fn as FunctionVal;
+    const scope = new Environment(func.declarationEnv);
+
+    // Create the variables for the parameter list
+    for (let i = 0; i < func.parameters.length; i++) {
+      // TODO: Check the bounds here
+      // Verify arity of the function
+      scope.declareVar(func.parameters[i], args[i], false);
+    }
+
+    let result: RuntimeVal = MK_NULL();
+
+    // Evaluate the function body line by line
+    for (const stmt of func.body) {
+      result = evaluate(stmt, scope);
+    }
+
+    return result;
+  }
+
+  throw "Cannot call a value that is not a function: " + JSON.stringify(fn);
 }

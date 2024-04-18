@@ -1,3 +1,4 @@
+import type { Statement } from "../frontend/ast";
 import type Environment from "./environment";
 
 export type ValueType =
@@ -6,7 +7,8 @@ export type ValueType =
   | "boolean"
   | "object"
   | "string"
-  | "nativeFn";
+  | "nativeFn"
+  | "function";
 
 export interface RuntimeVal {
   type: ValueType;
@@ -42,6 +44,14 @@ export type FunctionCall = (args: RuntimeVal[], env: Environment) => RuntimeVal;
 export interface NativeFnVal extends RuntimeVal {
   type: "nativeFn";
   call: FunctionCall;
+}
+
+export interface FunctionVal extends RuntimeVal {
+  type: "function";
+  name: string;
+  parameters: string[];
+  declarationEnv: Environment;
+  body: Statement[];
 }
 
 export function MK_NUMBER(n: number = 0): NumberVal {

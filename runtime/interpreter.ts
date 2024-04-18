@@ -10,6 +10,7 @@ import type {
   ObjectLiteral,
   StringLiteral,
   CallExpr,
+  FunctionDeclaration,
 } from "../frontend/ast";
 import Environment from "./environment";
 import {
@@ -19,7 +20,11 @@ import {
   evaluateObjectExpr,
   evaluateCallExpr,
 } from "./eval/expressions";
-import { evaluateProgram, evaluateVarDeclaration } from "./eval/statements";
+import {
+  evaluateFunctionDeclaration,
+  evaluateProgram,
+  evaluateVarDeclaration,
+} from "./eval/statements";
 
 export function evaluate(astNode: Statement, env: Environment): RuntimeVal {
   switch (astNode.kind) {
@@ -57,6 +62,9 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeVal {
 
     case "VarDeclaration":
       return evaluateVarDeclaration(astNode as VarDeclaration, env);
+
+    case "FunctionDeclaration":
+      return evaluateFunctionDeclaration(astNode as FunctionDeclaration, env);
 
     default:
       console.error(

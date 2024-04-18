@@ -12,6 +12,7 @@ import type {
   CallExpr,
   MemberExpr,
   StringLiteral,
+  FunctionDeclaration,
 } from "./ast";
 
 import { tokenize, type Token, TokenType } from "./lexer";
@@ -48,9 +49,60 @@ export default class Parser {
       case TokenType.Const:
         return this.parseVarDeclaration();
 
+      case TokenType.Func:
+        return this.parseFunctionDeclaration();
+
       default:
         return this.parseExpr();
     }
+  }
+
+  private parseFunctionDeclaration(): Statement {
+    this.eat();
+    const name = this.expect(
+      TokenType.Identifier,
+      "Expected a function name following fn keyword"
+    ).value;
+
+    const args = this.parseArgs();
+    const parameters: string[] = [];
+
+    for (const arg of args) {
+      if (arg.kind !== "Identifier") {
+        console.log(arg);
+        throw "Expected parameters of type string inside function declaration";
+      }
+
+      parameters.push((arg as Identifier).symbol);
+    }
+
+    this.expect(
+      TokenType.OpenBrace,
+      "Expected function body following declaration"
+    );
+
+    const body: Statement[] = [];
+
+    while (
+      this.at().type !== TokenType.CloseBrace &&
+      this.at().type !== TokenType.EOF
+    ) {
+      body.push(this.parseStatement());
+    }
+
+    this.expect(
+      TokenType.CloseBrace,
+      "Expected closing brace after function body"
+    );
+
+    const func: FunctionDeclaration = {
+      kind: "FunctionDeclaration",
+      body,
+      name,
+      parameters,
+    };
+
+    return func;
   }
 
   private parseVarDeclaration(): Statement {
@@ -316,7 +368,7 @@ export default class Parser {
         this.expect(
           TokenType.CloseParen,
           "Unexpected token found inside parenthesized expression, Expected closing parenthesis."
-        )
+        );
 
         return value;
       }

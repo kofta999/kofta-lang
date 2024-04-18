@@ -2,6 +2,7 @@ export enum TokenType {
   // Keywords
   Let,
   Const,
+  Func,
 
   // Literal Types
   Identifier,
@@ -30,6 +31,7 @@ export enum TokenType {
 const KEYWORDS: Record<string, TokenType> = {
   let: TokenType.Let,
   const: TokenType.Const,
+  func: TokenType.Func,
 };
 
 export interface Token {
