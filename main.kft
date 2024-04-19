@@ -2,4 +2,7 @@ func add(x, y) {
   x + y
 }
 
-add(1, 2)
+const obj = { x: 3}
+const x = 3;
+
+print( add(1, 2) +  x  == (4 > 3))

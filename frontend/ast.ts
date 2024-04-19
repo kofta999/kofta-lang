@@ -8,14 +8,27 @@ export type NodeType =
   | "AssignmentExpr"
   | "MemberExpr"
   | "CallExpr"
+  | "BinaryExpr"
 
   // Literals
   | "NumericLiteral"
   | "Identifier"
-  | "BinaryExpr"
   | "Property"
   | "ObjectLiteral"
   | "StringLiteral";
+
+export type Operator =
+  | "+"
+  | "-"
+  | "*"
+  | "/"
+  | "%"
+  | ">"
+  | "<"
+  | ">="
+  | "<="
+  | "=="
+  | "!=";
 
 // Statements
 
@@ -50,7 +63,7 @@ export interface BinaryExpr extends Expr {
   kind: "BinaryExpr";
   left: Expr;
   right: Expr;
-  operator: string;
+  operator: Operator;
 }
 
 export interface MemberExpr extends Expr {

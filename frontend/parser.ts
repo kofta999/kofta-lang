@@ -1,3 +1,4 @@
+import type { BinaryOperator } from "typescript";
 import type {
   Statement,
   Program,
@@ -161,9 +162,26 @@ export default class Parser {
     return this.parseAssignmentExpr();
   }
 
+  private parseAssignmentExpr(): Expr {
+    const left = this.parseObjectExpr();
+
+    if (this.at().type === TokenType.Equals) {
+      this.eat();
+      const value = this.parseAssignmentExpr();
+
+      return {
+        assignee: left,
+        kind: "AssignmentExpr",
+        value,
+      } as AssignmentExpr;
+    }
+
+    return left;
+  }
+
   private parseObjectExpr(): Expr {
     if (this.at().type !== TokenType.OpenBrace) {
-      return this.parseAdditiveExpr();
+      return this.parseEqualityExpr();
     }
 
     this.eat();
@@ -209,18 +227,47 @@ export default class Parser {
     return { kind: "ObjectLiteral", properties } as ObjectLiteral;
   }
 
-  private parseAssignmentExpr(): Expr {
-    const left = this.parseObjectExpr();
+  private parseEqualityExpr(): Expr {
+    let left = this.parseRelationalExpr();
 
-    if (this.at().type === TokenType.Equals) {
-      this.eat();
-      const value = this.parseAssignmentExpr();
+    while (
+      this.at().type === TokenType.EqualEqual ||
+      this.at().type === TokenType.NotEqual
+    ) {
+      const operator = this.eat().value;
+      const right = this.parseRelationalExpr();
 
-      return {
-        assignee: left,
-        kind: "AssignmentExpr",
-        value,
-      } as AssignmentExpr;
+      left = {
+        kind: "BinaryExpr",
+        left,
+        right,
+        operator,
+      } as BinaryExpr;
+    }
+
+    return left;
+  }
+
+  // Relational operators
+
+  private parseRelationalExpr(): Expr {
+    let left = this.parseAdditiveExpr();
+
+    while (
+      this.at().type === TokenType.LessThan ||
+      this.at().type === TokenType.GreaterThan ||
+      this.at().type === TokenType.GreaterThanOrEqual ||
+      this.at().type === TokenType.LessThanOrEqual
+    ) {
+      const operator = this.eat().value;
+      const right = this.parseAdditiveExpr();
+
+      left = {
+        kind: "BinaryExpr",
+        left,
+        right,
+        operator,
+      } as BinaryExpr;
     }
 
     return left;

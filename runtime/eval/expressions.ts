@@ -4,6 +4,7 @@ import type {
   CallExpr,
   Identifier,
   ObjectLiteral,
+  Operator,
 } from "../../frontend/ast";
 import Environment from "../environment";
 import { evaluate } from "../interpreter";
@@ -20,7 +21,7 @@ import {
 function evaluateNumericBinaryExpr(
   lhs: NumberVal,
   rhs: NumberVal,
-  operator: string
+  operator: Operator
 ): NumberVal {
   let result = 0;
 
@@ -42,7 +43,34 @@ function evaluateNumericBinaryExpr(
     case "%":
       result = lhs.value % rhs.value;
       break;
+
+    // TODO: Probably need to make these to a boolean type
+
+    case "<":
+      result = Number(lhs.value < rhs.value);
+      break;
+
+    case ">":
+      result = Number(lhs.value > rhs.value);
+      break;
+
+    case "<=":
+      result = Number(lhs.value <= rhs.value);
+      break;
+
+    case ">=":
+      result = Number(lhs.value >= rhs.value);
+      break;
+
+    case "==":
+      result = Number(lhs.value === rhs.value);
+      break;
+
+    case "!=":
+      result = Number(lhs.value !== rhs.value);
+      break;
   }
+
   return { type: "number", value: result };
 }
 

@@ -14,7 +14,6 @@ export enum TokenType {
   SemiColon,
   OpenParen,
   CloseParen,
-  BinaryOperator,
   Colon,
   Comma,
   Dot,
@@ -23,6 +22,24 @@ export enum TokenType {
   OpenBracket,
   CloseBracket,
   DoubleQuote,
+
+  // Arithmetic Operators
+  PlusToken,
+  MinusToken,
+  AsteriskToken,
+  SlashToken,
+  PercentToken,
+
+  // Comparison Operators
+  LessThan,
+  GreaterThan,
+  LessThanOrEqual,
+  GreaterThanOrEqual,
+  EqualEqual,
+  NotEqual,
+
+  // Logical Operators
+  ExclamationToken,
 
   // End of File
   EOF,
@@ -107,17 +124,80 @@ export function tokenize(sourceCode: string): Token[] {
         break;
       }
 
-      case "+":
-      case "-":
-      case "*":
-      case "/":
+      case "+": {
+        tokens.push(createToken(src.shift()!, TokenType.PlusToken));
+        break;
+      }
+
+      case "-": {
+        tokens.push(createToken(src.shift()!, TokenType.MinusToken));
+        break;
+      }
+
+      case "*": {
+        tokens.push(createToken(src.shift()!, TokenType.AsteriskToken));
+        break;
+      }
+
+      case "/": {
+        tokens.push(createToken(src.shift()!, TokenType.SlashToken));
+        break;
+      }
+
       case "%": {
-        tokens.push(createToken(src.shift()!, TokenType.BinaryOperator));
+        tokens.push(createToken(src.shift()!, TokenType.PercentToken));
+        break;
+      }
+
+      case "<": {
+        let token = src.shift()!;
+        if ((src[0] as string) === "=") {
+          token += src.shift()!;
+          tokens.push(createToken(token, TokenType.LessThanOrEqual));
+        } else {
+          tokens.push(createToken(token, TokenType.LessThan));
+        }
+
+        break;
+      }
+
+      case ">": {
+        let token = src.shift()!;
+
+        if ((src[0] as string) === "=") {
+          token += src.shift()!;
+
+          tokens.push(createToken(token, TokenType.GreaterThanOrEqual));
+        } else {
+          tokens.push(createToken(token, TokenType.GreaterThan));
+        }
         break;
       }
 
       case "=": {
-        tokens.push(createToken(src.shift()!, TokenType.Equals));
+        let token = src.shift()!;
+
+        if (src[0] === "=") {
+          token += src.shift()!;
+          tokens.push(createToken(token, TokenType.EqualEqual));
+        } else {
+          tokens.push(createToken(token, TokenType.Equals));
+        }
+
+        break;
+      }
+
+      case "!": {
+        let token = src.shift()!;
+
+        if ((src[0] as string) === "=") {
+          token += src.shift()!;
+
+          tokens.push(createToken(token, TokenType.NotEqual));
+        } else {
+          tokens.push(createToken(token, TokenType.ExclamationToken));
+        }
+
         break;
       }
 
