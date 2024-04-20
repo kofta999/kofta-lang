@@ -10,6 +10,8 @@ export type ValueType =
   | "nativeFn"
   | "function";
 
+export type ComparableVal = NumberVal | NullVal | StringVal | BooleanVal;
+
 export interface RuntimeVal {
   type: ValueType;
 }

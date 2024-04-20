@@ -17,18 +17,11 @@ export type NodeType =
   | "ObjectLiteral"
   | "StringLiteral";
 
-export type Operator =
-  | "+"
-  | "-"
-  | "*"
-  | "/"
-  | "%"
-  | ">"
-  | "<"
-  | ">="
-  | "<="
-  | "=="
-  | "!=";
+export type ArithmeticOperator = "+" | "-" | "*" | "/" | "%";
+
+export type ComparisonOperator = ">" | "<" | ">=" | "<=" | "==" | "!=";
+
+export type LogicalOperator = "&&" | "||";
 
 // Statements
 
@@ -63,7 +56,7 @@ export interface BinaryExpr extends Expr {
   kind: "BinaryExpr";
   left: Expr;
   right: Expr;
-  operator: Operator;
+  operator: ArithmeticOperator | ComparisonOperator | LogicalOperator;
 }
 
 export interface MemberExpr extends Expr {

@@ -1,3 +1,5 @@
+import type { BarBarEqualsToken } from "typescript";
+
 export enum TokenType {
   // Keywords
   Let,
@@ -40,6 +42,8 @@ export enum TokenType {
 
   // Logical Operators
   ExclamationToken,
+  AmpersandAmpersandToken,
+  BarBarToken,
 
   // End of File
   EOF,
@@ -196,6 +200,30 @@ export function tokenize(sourceCode: string): Token[] {
           tokens.push(createToken(token, TokenType.NotEqual));
         } else {
           tokens.push(createToken(token, TokenType.ExclamationToken));
+        }
+
+        break;
+      }
+
+      case "&": {
+        let token = src.shift()!;
+
+        if ((src[0] as string) === "&") {
+          token += src.shift()!;
+
+          tokens.push(createToken(token, TokenType.AmpersandAmpersandToken));
+        }
+
+        break;
+      }
+
+      case "|": {
+        let token = src.shift()!;
+
+        if ((src[0] as string) === "|") {
+          token += src.shift()!;
+
+          tokens.push(createToken(token, TokenType.BarBarToken));
         }
 
         break;

@@ -181,7 +181,7 @@ export default class Parser {
 
   private parseObjectExpr(): Expr {
     if (this.at().type !== TokenType.OpenBrace) {
-      return this.parseEqualityExpr();
+      return this.parseORExpr();
     }
 
     this.eat();
@@ -225,6 +225,42 @@ export default class Parser {
     this.expect(TokenType.CloseBrace, "Object literal missing closing brace");
 
     return { kind: "ObjectLiteral", properties } as ObjectLiteral;
+  }
+
+  private parseORExpr(): Expr {
+    let left = this.parseANDExpr();
+
+    while (this.at().type === TokenType.BarBarToken) {
+      const operator = this.eat().value;
+      const right = this.parseANDExpr();
+
+      left = {
+        kind: "BinaryExpr",
+        left,
+        right,
+        operator,
+      } as BinaryExpr;
+    }
+
+    return left;
+  }
+
+  private parseANDExpr(): Expr {
+    let left = this.parseEqualityExpr();
+
+    while (this.at().type === TokenType.AmpersandAmpersandToken) {
+      const operator = this.eat().value;
+      const right = this.parseEqualityExpr();
+
+      left = {
+        kind: "BinaryExpr",
+        left,
+        right,
+        operator,
+      } as BinaryExpr;
+    }
+
+    return left;
   }
 
   private parseEqualityExpr(): Expr {
