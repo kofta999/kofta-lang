@@ -2,6 +2,9 @@
   "name": "kofta-lang",
   "module": "index.ts",
   "type": "module",
+  "bin": {
+    "kofta": "./bin/kofta"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

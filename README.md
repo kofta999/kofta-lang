@@ -18,5 +18,4 @@ This project was created using `bun init` in bun v1.1.3. [Bun](https://bun.sh) i
 
 1. Make a strict type system?
 2. Improve syntax
-3. Make .kft files runnable (Maybe add syntax highlighting too?)
-4. Add logical operators
+3. Add syntax highlighting

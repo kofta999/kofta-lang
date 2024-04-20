@@ -1,0 +1,38 @@
+#!/usr/bin/env bun
+
+// Kofta lang file runner
+import { parseArgs } from "util";
+import Parser from "../frontend/parser";
+import Environment from "../runtime/environment";
+import { evaluate } from "../runtime/interpreter";
+
+try {
+  const { values, positionals } = parseArgs({
+    args: Bun.argv,
+    options: {},
+    strict: true,
+    allowPositionals: true,
+  });
+  const fileName = positionals[2];
+
+  if (!fileName) {
+    console.error(`A .kft file should be provided`);
+    process.exit(0);
+  }
+
+  await run(fileName);
+} catch (error) {
+  console.error(`Unknown arguments`);
+  process.exit(0);
+}
+
+async function run(filePath: string) {
+  const parser = new Parser();
+  const env = new Environment();
+
+  const file = Bun.file(filePath);
+
+  const program = parser.produceAST(await file.text());
+
+  evaluate(program, env);
+}
